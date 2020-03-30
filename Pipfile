@@ -1,0 +1,16 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pytest = "*"
+
+[packages]
+flask = "*"
+sqlalchemy = "*"
+e1839a8 = {editable = true,path = "."}
+webshop = {editable = true,path = "."}
+
+[requires]
+python_version = "3.8"
