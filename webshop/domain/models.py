@@ -1,45 +1,14 @@
 import collections
 import enum
-from uuid import uuid4
-from typing import DefaultDict, NamedTuple
+from uuid import UUID
+from typing import DefaultDict, NamedTuple, Dict
 
-class Item(object):
+class ItemNotFoundException(Exception):
+    pass
 
-    def __init__(self, id: uuid4, name: str, description: str, price: float):
-        self.id = uuid4
-        self.name = name
-        self.description = description
-        self.price = price
+class InsufficientItemsInStockException(Exception):
+    pass
 
-    def __eq__(self, value):
-        if value is not Item:
-            return False
-        if self.id == value.id:
-            return True
-        return False        
-        
-
-class Shop(object):
-
-    def __init__(self):
-        self.items = DefaultDict[Item, int]
-        self.cash: float = 0.0
-
-    def stockItem(self, item: Item, qty: int):
-        if item in self.items:
-            self.items[item] += qty
-        else:
-            self.items[item] = qty
-
-    def sellItem(self, item: Item, qty: int):
-        pass
-
-    def updatePrice(self, item: Item, price: float):
-        pass
-
-    @property
-    def cashInStore(self):
-        raise NotImplementedError()
 
 
 class ItemCategory(enum.Enum):
@@ -48,3 +17,81 @@ class ItemCategory(enum.Enum):
     Beverages = 2
     Hardware = 3
     HomeEquipment = 4
+
+class Item(object):
+
+    def __init__(self, id: UUID, name: str, description: str, price: float, category: ItemCategory = ItemCategory.Hardware):
+        self.id = id
+        self.name = name
+        self.description = description
+        self.price = price
+        self.category = category
+
+    def __eq__(self, value):
+        if value is not Item:
+            return False
+        if self.id == value.id:
+            return True
+        return False
+
+    def __hash__(self):
+        return super().__hash__()
+
+    @classmethod
+    def from_dict(cls, props):
+        item = Item(id = props['id'], name=props['name'], description=props['description'], price = props['price'])
+        return item        
+        
+
+class Shop(object):
+    ''' items: a collection containing the items available in the shop. Should be contained on an appropriate data structure
+                Dict[id, NamedTuple] may work for now 
+
+    '''
+    @classmethod
+    def create(cls, items: Dict[Item, int]):
+        pass
+
+    @classmethod
+    def from_array(cls, items):
+        shop = Shop()
+        for i in items:
+            item = Item.from_dict(i)            
+            shop.stockItem(item, 1)
+        return shop
+
+    def __init__(self):
+        self.items_qty = collections.defaultdict()
+        self.items_info = collections.defaultdict(None)
+        self.cash: float = 0.0
+ 
+    def stockItem(self, item: Item, qty: int):
+        if item.id in self.items_qty:
+            self.items_qty[item.id] += qty            
+        else:
+            self.items_qty[item.id] = qty
+            self.items_info[item.id] = item
+
+    def sellItem(self, item: Item, qty: int):
+        if item.id in self.items_qty:
+            if self.items_qty[item.id] <= qty:
+                self.items_qty[item.id] -= qty
+                self.cash += self.items_info[item.id].price * qty
+            else:
+                raise InsufficientItemsInStockException()
+        else:
+            raise ItemNotFoundException()
+        pass
+
+    def updatePrice(self, item: Item, price: float):
+        pass
+
+    def checkItemQty(self, item: Item) -> int:
+        if item.id not in self.items_qty:
+            raise ItemNotFoundException()
+        else:
+            return self.items_qty[item.id]
+            
+    @property
+    def cashInStore(self):
+        return self.cash
