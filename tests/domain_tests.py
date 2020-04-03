@@ -22,9 +22,6 @@ stockedItems = [
         }
     ]
 
-# shop = Shop.from_array(stockedItems)
-# item = Item.from_dict(stockedItems[0])
-
 def test_shop_stock_item():
     shop = Shop.from_array(stockedItems)
     item = Item.from_dict(stockedItems[0])

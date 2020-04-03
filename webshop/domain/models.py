@@ -85,8 +85,7 @@ class Shop(object):
             else:
                 raise InsufficientItemsInStockException()
         else:
-            raise ItemNotFoundException()
-        pass
+            raise ItemNotFoundException()        
 
     def updatePrice(self, item: Item, price: float):
         pass
