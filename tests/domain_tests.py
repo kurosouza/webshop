@@ -65,3 +65,7 @@ def test_item_from_dict():
     assert slipperItem.price == props['price']
     assert slipperItem.description == props['description']
     assert slipperItem.id == props['id']
+
+def test_get_item():
+    shop = Shop.from_array(stockedItems)
+    assert shop.getItem(stockedItems[0]['id']).id == stockedItems[0]['id']

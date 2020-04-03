@@ -65,6 +65,11 @@ class Shop(object):
         self.items_info = collections.defaultdict(None)
         self.cash: float = 0.0
  
+    def getItem(self, uid: UUID) -> Item:
+        if uid not in self.items_info:
+            raise ItemNotFoundException()
+        return self.items_info[uid]
+
     def stockItem(self, item: Item, qty: int):
         if item.id in self.items_qty:
             self.items_qty[item.id] += qty            
