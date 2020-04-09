@@ -1,7 +1,6 @@
-
 import typing
 import collections
-import uuid
+from uuid import UUID
 
 import sqlalchemy
 from sqlalchemy import Table, Column, String, Float, Integer, create_engine, MetaData
@@ -70,6 +69,10 @@ class SqlAlchemy:
         self.engine = create_engine(uri)
         self._session_maker = scoped_session(sessionmaker(self.engine),)
 
+    @property
+    def unit_of_work_manager(self):
+        return SqlAlchemyUnitOfWorkManager(self._session_maker)
+
     def register_in(self, container):
         container.register(SessionFactory, lambda x: self._session_maker)
         container.register(UnitOfWorkManager, SqlAlchemyUnitOfWorkManager)
@@ -84,9 +87,9 @@ class SqlAlchemy:
         self.metadata.create_all()
 
     def configure_mappings(self):
-        self.metadata = MetaData(self.engien)
+        self.metadata = MetaData(self.engine)
         items_table = Table('items',self.metadata,
-                        Column('id', UUIDType),    
+                        Column('id', UUIDType, primary_key = True),    
                         Column('name', String(50)),
                         Column('description', String(100)),
                         Column('category', String(50)),

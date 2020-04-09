@@ -10,7 +10,6 @@ class InsufficientItemsInStockException(Exception):
     pass
 
 
-
 class ItemCategory(enum.Enum):
     Grocery = 0
     Toileteries = 1

@@ -23,12 +23,6 @@ class ItemRepositorySpec(abc.ABC):
         return item
 
 
-    @abc.abstractmethod
-    @property
-    def items(self):
-        pass
-
-
 class UnitOfWork(abc.ABC):
 
     @abc.abstractmethod
@@ -47,8 +41,8 @@ class UnitOfWork(abc.ABC):
     def rollback(self):
         pass
 
-    @abc.abstractmethod
     @property
+    @abc.abstractmethod    
     def items(self):
         pass
 
